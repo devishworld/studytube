@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <title>StudyTube</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="stlogo.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script>
+      $(document).ready(function() {
+        $('#search-form').submit(function(event) {
+          event.preventDefault();
+          var searchKeyword = $('#search-keyword').val();
+          var apiUrl = 'https://api.unsplash.com/photos/random?query=' + searchKeyword + '&orientation=landscape&client_id=m0ABavAoRHwTNp1LJjkKlDpLRAi9ACZGMB4LVfx0cdc';
+          $.getJSON(apiUrl, function(data) {
+            var imageUrl = data.urls.regular;
+            $('body').css('background-image', 'url(' + imageUrl + ')');
+          });
+          $('#search-keyword').val('');
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <nav>
+        <div class="logo">
+            <a href="index.html"><img src="logost.png" alt="Logo"></a>
+            <h1>StudyTube</h1>
+          </div>
+          <form class="search-form" onsubmit="return searchYouTube();">
+            <input type="text" id="query" name="query" placeholder="Search topics here...">
+            <label for="count" class="searchoption">Display:</label>
+            <div class="custom-select">
+              <select id="count" name="count">
+                <!-- <option value="5">5</option> -->
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+            <!-- <button type="submit">Search</button> -->
+            <button type="submit" class="search-button">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="25" y1="25" x2="16.65" y2="16.65"></line>
+              </svg>
+          </button>
+          </form>
+          <ul class="social-media">
+            <li><a href="https://www.linkedin.com/in/dev-vishwakarma-89aa71213/" target="_blank"><img src="linkedin.png"></a></li>
+            <li><a href="https://www.instagram.com/_devvishwakarma/" target="_blank"><img src="insta.png"></a></li>
+            <li><a href="https://www.youtube.com/@devishworld2059/videos" target="_blank"><img src="youtube.png"></a></li>
+        </ul>
+    </nav>
+    <div id="videos"></div>
+    <div class="video-container">
+      <a class="thumbnail" href="#" onclick="playVideo('VIDEO_ID')">
+        <img src="THUMBNAIL_URL" alt="">
+      </a>
+    </div>
+    <h1 class="word"></h1>
+    <script>
+      function playVideo(videoId) {
+        if (window.innerWidth <= 600) {
+          var width = window.innerWidth * 0.9;
+          var height = width * 0.5625; // Assuming 16:9 aspect ratio
+          var left = (window.innerWidth - width) / 2;
+          var top = (window.innerHeight - height) / 2;
+          window.open('https://www.youtube.com/embed/' + videoId + '?autoplay=1', 'popup', 'width=' + width + ',height=' + height + ',left=' + left + ',top=' + top + ',resizable=yes');
+        } else {
+          // If not on mobile, play the video in an iframe
+          var iframe = document.createElement('iframe');
+          iframe.setAttribute('src', 'https://www.youtube.com/embed/' + videoId + '?autoplay=1');
+          iframe.setAttribute('frameborder', '0');
+          iframe.setAttribute('allowfullscreen', '');
+          document.getElementById('video-container').appendChild(iframe);
+        }
+      }
+      </script>
+    <script>
+    function playVideo(videoId) {
+      if (window.innerWidth <= 600) {
+        var width = window.innerWidth * 0.9;
+        var height = width * 0.5625; // Assuming 16:9 aspect ratio
+        var left = (window.innerWidth - width) / 2;
+        var top = (window.innerHeight - height) / 2;
+        window.open('https://www.youtube.com/embed/' + videoId + '?autoplay=1', 'popup', 'width=' + width + ',height=' + height + ',left=' + left + ',top=' + top + ',resizable=yes');
+      } else {
+        document.getElementById('video-player').src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1';
+        document.getElementById('video-modal').style.display = 'block';
+      }
+    }
+    </script>
+    <script>
+      function searchYouTube() {
+        var query = document.getElementById("query").value;
+        var count = document.getElementById("count").value;
+        var url = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=" + encodeURIComponent(query) + "&maxResults=" + count + "&key=AIzaSyBJMw5lIzNF0qJRkGJ4bYi8qkvHNGmaITI";
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url);
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+            var videos = response.items.map(function(item) {
+              var videoId = item.id.videoId;
+              var thumbnailUrl = item.snippet.thumbnails.medium.url;
+              var title = item.snippet.title;
+              var videoHtml = '<div class="video-container"><a href="#" onclick="openVideo(\'' + videoId + '\', \'' + title + '\');"><img src="' + thumbnailUrl + '"><br>' + title + '</a></div>';
+              return videoHtml;
+            });
+            document.getElementById("videos").innerHTML = videos.join("");
+          } else {
+            console.log("Error: " + xhr.status);
+          }
+        };
+        xhr.send();
+        return false;
+      }
+      function openVideo(videoId, title) {
+        var width = 800;
+        var height = 600;
+        var left = (screen.width - width) / 2;
+        var top = (screen.height - height) / 2;
+        var url = "https://www.youtube.com/embed/" + videoId + "?autoplay=1&rel=0&controls=1&showinfo=0&fs=1";
+        var params = "width=" + width + ",height=" + height + ",left=" + left + ",top=" + top;
+        var popup = window.open(url, title, params);
+        popup.focus();
+        return false;
+      }
+    </script>
+    <script>
+      var words = ["Let's Focus on our Studies with StudyTube", "Learn Anything", "Ads Free Youtube Videos", "Play the video inside a pop up window", "Let me know your suggestions about the improvements"],
+    part,
+    i = 0,
+    offset = 0,
+    len = words.length,
+    forwards = true,
+    skip_count = 0,
+    skip_delay = 15,
+    speed = 100;
+var wordflick = function () {
+  setInterval(function () {
+    if (forwards) {
+      if (offset >= words[i].length) {
+        ++skip_count;
+        if (skip_count == skip_delay) {
+          forwards = false;
+          skip_count = 0;
+        }
+      }
+    }
+    else {
+      if (offset == 0) {
+        forwards = true;
+        i++;
+        offset = 0;
+        if (i >= len) {
+          i = 0;
+        }
+      }
+    }
+    part = words[i].substr(0, offset);
+    if (skip_count == 0) {
+      if (forwards) {
+        offset++;
+      }
+      else {
+        offset--;
+      }
+    }
+    $('.word').text(part);
+  },speed);
+};
+
+$(document).ready(function () {
+  wordflick();
+});
+    </script>
+  </body>
+</html>
